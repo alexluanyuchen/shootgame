@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEON STRIKE 3D</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #050914;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#top {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.panel {
+  background: rgba(5, 20, 40, .85);
+  border: 1px solid #24cfff;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+#stats {
+  display: flex;
+  gap: 10px;
+}
+
+.stat {
+  text-align: center;
+  min-width: 70px;
+}
+
+.stat b {
+  display: block;
+  font-size: 22px;
+  color: #52eaff;
+}
+
+#healthBox {
+  position: absolute;
+  bottom: 20px;
+  left: 15px;
+  width: 220px;
+}
+
+#healthBar {
+  height: 10px;
+  background: #263449;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#healthFill {
+  width: 100%;
+  height: 100%;
+  background: #21e6c1;
+}
+
+#crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 25px;
+  color: #64edff;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(2, 7, 18, .92);
+  z-index: 10;
+  padding: 20px;
+}
+
+#menu {
+  width: 450px;
+  max-width: 100%;
+  text-align: center;
+  padding: 30px;
+  background: #101d33;
+  border: 1px solid #27cfff;
+  border-radius: 18px;
+}
+
+h1 {
+  font-size: 38px;
+  color: #57eaff;
+  text-shadow: 0 0 20px #168cff;
+}
+
+button {
+  padding: 14px 25px;
+  background: #1265bd;
+  border: 1px solid #52eaff;
+  border-radius: 9px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #218ce8;
+}
+
+#start {
+  width: 100%;
+  margin-top: 20px;
+}
+
+#status {
+  font-size: 12px;
+  color: #8bc9e9;
+  min-height: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#mobile {
+  display: none;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#stick {
+  position: absolute;
+  left: 20px;
+  bottom: 30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #50eaff;
+  background: #143b5c88;
+  pointer-events: auto;
+}
+
+#knob {
+  position: absolute;
+  left: 35px;
+  top: 35px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #50eaff88;
+}
+
+#fire {
+  position: absolute;
+  right: 25px;
+  bottom: 45px;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+#look {
+  position: absolute;
+  left: 38%;
+  right: 0;
+  top: 15%;
+  bottom: 0;
+  pointer-events: auto;
+}
+
+@media (pointer: coarse) {
+  #mobile {
+    display: block;
+  }
+  #healthBox {
+    bottom: 160px;
+    width: 160px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div id="hud">
+  <div id="top">
+    <div class="panel">
+      <b style="color:#50eaff">NEON STRIKE 3D</b>
+    </div>
+
+    <div id="stats">
+      <div class="panel stat">
+        SCORE
+        <b id="score">0</b>
+      </div>
+
+      <div class="panel stat">
+        WAVE
+        <b id="wave">1</b>
+      </div>
+
+      <div class="panel stat">
+        ENEMIES
+        <b id="enemies">0</b>
+      </div>
+    </div>
+  </div>
+
+  <div id="crosshair">+</div>
+
+  <div id="healthBox" class="panel">
+    ENERGY SHIELD
+    <div id="healthBar">
+      <div id="healthFill"></div>
+    </div>
+    <span id="healthText">100%</span>
+  </div>
+</div>
+
+<div id="mobile">
+  <div id="stick">
+    <div id="knob"></div>
+  </div>
+
+  <div id="look"></div>
+
+  <button id="fire">FIRE</button>
+</div>
+
+<div id="overlay">
+  <div id="menu">
+    <h1 id="title">NEON STRIKE</h1>
+
+    <p>3D FUTURE COMBAT</p>
+
+    <p>
+      在未来科技训练场中挑战机器人敌人。
+      生存、射击、升级波次！
+    </p>
+
+    <p>
+      电脑：WASD 移动，鼠标瞄准，左键射击。
+      <br>
+      手机：摇杆移动，右侧区域转向，FIRE 射击。
+    </p>
+
+    <p id="status">正在等待游戏引擎...</p>
+
+    <button id="start">开始游戏</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="./game.js"></script>
+
+</body>
+</html>
